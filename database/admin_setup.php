@@ -1,0 +1,57 @@
+<?php
+/**
+ * ============================================================================
+ * ADMIN USER TABLE SETUP & SEEDER
+ * ============================================================================
+ */
+
+require_once dirname(__DIR__) . '/config/database.php';
+
+try {
+    echo "Connecting to MySQL/TiDB database...\n";
+    $pdo = getAdminDB();
+    echo "Connected successfully!\n\n";
+
+    // Create admin_users table
+    $sql = "
+        CREATE TABLE IF NOT EXISTS `admin_users` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `username` VARCHAR(100) NOT NULL UNIQUE,
+            `password_hash` VARCHAR(255) NOT NULL,
+            `role` VARCHAR(50) NOT NULL DEFAULT 'Administrator',
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `last_login` DATETIME NULL,
+            INDEX `idx_admin_username` (`username`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ";
+
+    $pdo->exec($sql);
+    echo "Table 'admin_users' created or verified.\n";
+
+    // Check if default admin exists
+    $defaultUser = getenv('ADMIN_USERNAME') ?: 'admin';
+    $defaultPass = getenv('ADMIN_PASSWORD') ?: 'Admin@2026#Stock';
+
+    $stmt = $pdo->prepare("SELECT id FROM admin_users WHERE username = ?");
+    $stmt->execute([$defaultUser]);
+    $existing = $stmt->fetch();
+
+    $hash = password_hash($defaultPass, PASSWORD_BCRYPT);
+
+    if (!$existing) {
+        $ins = $pdo->prepare("INSERT INTO admin_users (username, password_hash, role) VALUES (?, ?, 'Administrator')");
+        $ins->execute([$defaultUser, $hash]);
+        echo "Default admin user '{$defaultUser}' created successfully with password.\n";
+    } else {
+        // Update password hash to match current .env password
+        $up = $pdo->prepare("UPDATE admin_users SET password_hash = ? WHERE username = ?");
+        $up->execute([$hash, $defaultUser]);
+        echo "Admin user '{$defaultUser}' password synchronized.\n";
+    }
+
+    echo "\nAdmin Setup Complete!\n";
+
+} catch (Exception $e) {
+    echo "Setup Error: " . $e->getMessage() . "\n";
+    exit(1);
+}
