@@ -368,6 +368,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.table-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .table-title {
@@ -380,6 +388,42 @@ body {
   font-size: 0.82rem;
   color: var(--text-muted);
 }
+
+/* View Mode Switcher (Cards vs Table) */
+.view-switcher {
+  display: inline-flex;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 2px;
+}
+
+.view-toggle-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+
+.view-toggle-btn:hover {
+  color: #ffffff;
+}
+
+.view-toggle-btn.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border-color: var(--success-border);
+}
+
 
 .table-responsive {
   width: 100%;
@@ -498,6 +542,195 @@ body {
   border-color: var(--info-border);
   color: #7dd3fc;
 }
+
+/* ==========================================================================
+   Mobile Leads Cards System
+   ========================================================================== */
+.mobile-leads-container {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+
+.mobile-lead-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.mobile-lead-card:hover {
+  border-color: var(--border-medium);
+}
+
+.mobile-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mobile-card-ref-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-card-num {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.mobile-card-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mobile-card-name {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.mobile-card-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* 1-Tap Quick Action Contact Chips */
+.mobile-contact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mobile-contact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.mobile-contact-chip.tel {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid var(--info-border);
+  color: #7dd3fc;
+}
+.mobile-contact-chip.tel:hover,
+.mobile-contact-chip.tel:active {
+  background: rgba(56, 189, 248, 0.22);
+  color: #ffffff;
+}
+
+.mobile-contact-chip.wa {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid var(--success-border);
+  color: #6ee7b7;
+}
+.mobile-contact-chip.wa:hover,
+.mobile-contact-chip.wa:active {
+  background: rgba(16, 185, 129, 0.22);
+  color: #ffffff;
+}
+
+.mobile-card-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.mobile-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-detail-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.mobile-detail-val {
+  font-size: 0.82rem;
+  color: #ffffff;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.mobile-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mobile-action-btn-view {
+  flex: 1;
+  height: 38px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid var(--info-border);
+  border-radius: var(--radius-sm);
+  color: #7dd3fc;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mobile-action-btn-view:hover,
+.mobile-action-btn-view:active {
+  background: rgba(56, 189, 248, 0.2);
+  color: #ffffff;
+}
+
+.mobile-action-btn-delete {
+  width: 38px;
+  height: 38px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  color: #f87171;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.mobile-action-btn-delete:hover,
+.mobile-action-btn-delete:active {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ffffff;
+}
+
 
 /* ==========================================================================
    Pagination Controls (100 per page)
@@ -769,3 +1002,266 @@ body {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ==========================================================================
+   TABLET RESPONSIVENESS (1024px and below)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .nav-container {
+    padding: 0 18px;
+  }
+  .main-layout {
+    padding: 20px 18px;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .toolbar-grid {
+    gap: 12px;
+  }
+  .filter-group.search-group {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+  .filter-group {
+    min-width: 140px;
+  }
+  .leads-table th,
+  .leads-table td {
+    padding: 11px 12px;
+    font-size: 0.82rem;
+  }
+}
+
+/* ==========================================================================
+   MOBILE & SMALL TABLET RESPONSIVENESS (768px and below)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .top-nav {
+    height: 58px;
+  }
+  .nav-container {
+    height: 58px;
+    padding: 0 14px;
+  }
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+  .brand-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  .brand-title {
+    font-size: 0.95rem;
+  }
+  .brand-tag {
+    display: none;
+  }
+  .nav-actions {
+    gap: 8px;
+  }
+  .user-badge {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+  .user-badge span:not(.user-status-dot) {
+    display: none;
+  }
+  .user-badge::after {
+    content: "Admin";
+    font-weight: 600;
+  }
+  .btn-logout {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    height: 34px;
+  }
+
+  .main-layout {
+    padding: 14px 12px;
+  }
+
+  /* Stats 2x2 Grid */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    padding: 12px 14px;
+  }
+  .stat-info h3 {
+    font-size: 0.7rem;
+    margin-bottom: 4px;
+  }
+  .stat-info .stat-value {
+    font-size: 1.35rem;
+  }
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+  .stat-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Toolbar */
+  .toolbar-card {
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .toolbar-grid {
+    gap: 10px;
+  }
+  .filter-group.search-group {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+  .filter-group {
+    flex: 1 1 calc(50% - 6px);
+    min-width: calc(50% - 6px);
+  }
+  #rangeContainer {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .date-toggle-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+  #btnToggleRange {
+    width: 100%;
+    height: 38px;
+  }
+  .toolbar-actions {
+    margin-left: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .toolbar-actions .btn {
+    width: 100%;
+    height: 38px;
+  }
+
+  /* Table Header Meta */
+  .table-header-meta {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .table-title-group {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .view-switcher {
+    align-self: flex-start;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .view-toggle-btn {
+    justify-content: center;
+    padding: 7px 10px;
+  }
+
+  /* Pagination */
+  .pagination-bar {
+    padding: 14px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+  }
+  .pagination-meta {
+    font-size: 0.78rem;
+    order: 2;
+  }
+  .pagination-controls {
+    width: 100%;
+    justify-content: space-between;
+    order: 1;
+  }
+  .page-btn {
+    flex: 1;
+    max-width: 110px;
+    height: 38px;
+    justify-content: center;
+  }
+
+  /* Modals */
+  .modal-overlay {
+    padding: 10px;
+  }
+  .modal-card {
+    max-width: 100%;
+    max-height: 94vh;
+    border-radius: 12px;
+  }
+  .modal-header {
+    padding: 14px 16px;
+  }
+  .modal-title {
+    font-size: 0.95rem;
+    word-break: break-word;
+  }
+  .modal-body {
+    padding: 14px 16px;
+  }
+  .lead-profile-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  .modal-footer {
+    padding: 12px 16px;
+  }
+  .modal-footer .btn {
+    width: 100%;
+    height: 42px;
+  }
+  #deleteModal .modal-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* Toast Notification on mobile */
+  .toast {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   EXTRA SMALL SCREENS (480px and below)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .mobile-card-details-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .stat-info .stat-value {
+    font-size: 1.22rem;
+  }
+  .btn-logout span {
+    display: none;
+  }
+  .btn-logout {
+    padding: 6px 8px;
+  }
+}
+

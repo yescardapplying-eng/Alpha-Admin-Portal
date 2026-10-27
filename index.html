@@ -206,11 +206,35 @@
     <!-- Leads Table Card -->
     <section class="table-card">
       <div class="table-header-meta">
-        <h2 class="table-title">Leads Directory</h2>
-        <span class="table-count-badge" id="tableCountBadge">Loading leads...</span>
+        <div class="table-title-group">
+          <h2 class="table-title">Leads Directory</h2>
+          <span class="table-count-badge" id="tableCountBadge">Loading leads...</span>
+        </div>
+
+        <!-- View Mode Switcher (Cards vs Table) -->
+        <div class="view-switcher" id="viewSwitcher" role="radiogroup" aria-label="Directory View Mode">
+          <button type="button" class="view-toggle-btn active" id="btnViewCards" title="Mobile Cards View" aria-pressed="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Cards</span>
+          </button>
+          <button type="button" class="view-toggle-btn" id="btnViewTable" title="Full Table View" aria-pressed="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <span>Table</span>
+          </button>
+        </div>
       </div>
 
-      <div class="table-responsive">
+      <!-- Desktop & Tablet Table View -->
+      <div class="table-responsive" id="tableResponsiveWrap">
         <table class="leads-table">
           <thead>
             <tr>
@@ -231,6 +255,11 @@
             <!-- Dynamically populated rows via dashboard.js -->
           </tbody>
         </table>
+      </div>
+
+      <!-- Mobile & Touch Card View -->
+      <div class="mobile-leads-container" id="mobileLeadsContainer">
+        <!-- Dynamically populated mobile cards via dashboard.js -->
       </div>
 
       <!-- Pagination Bar (100 per page) -->

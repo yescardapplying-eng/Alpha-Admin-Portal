@@ -21,7 +21,9 @@
     status: 'all',
     sort: 'DESC',
     activeLeadToDelete: null,
-    searchDebounceTimer: null
+    searchDebounceTimer: null,
+    viewMode: window.innerWidth <= 768 ? 'cards' : 'table',
+    userSelectedView: false
   };
 
   // DOM Elements
@@ -56,7 +58,11 @@
       singleDateContainer: document.getElementById('singleDateContainer'),
 
       // Table & Pagination
+      tableResponsiveWrap: document.getElementById('tableResponsiveWrap'),
       leadsTableBody: document.getElementById('leadsTableBody'),
+      mobileLeadsContainer: document.getElementById('mobileLeadsContainer'),
+      btnViewCards: document.getElementById('btnViewCards'),
+      btnViewTable: document.getElementById('btnViewTable'),
       tableCountBadge: document.getElementById('tableCountBadge'),
       paginationMeta: document.getElementById('paginationMeta'),
       btnPrevPage: document.getElementById('btnPrevPage'),
@@ -263,6 +269,33 @@
       dom.btnDeleteConfirm.addEventListener('click', executeDeleteLead);
     }
 
+    // View Mode Switcher (Cards vs Table)
+    if (dom.btnViewCards) {
+      dom.btnViewCards.addEventListener('click', function () {
+        state.userSelectedView = true;
+        setViewMode('cards');
+      });
+    }
+
+    if (dom.btnViewTable) {
+      dom.btnViewTable.addEventListener('click', function () {
+        state.userSelectedView = true;
+        setViewMode('table');
+      });
+    }
+
+    // Auto-adjust view on screen resize if user hasn't explicitly chosen
+    let resizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        if (!state.userSelectedView) {
+          state.viewMode = window.innerWidth <= 768 ? 'cards' : 'table';
+        }
+        updateViewModeDisplay();
+      }, 150);
+    });
+
     // Escape closes modals
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') {
@@ -270,6 +303,42 @@
         closeDeleteModal();
       }
     });
+  }
+
+  /**
+   * Switch between Mobile Cards View and Full Data Table View
+   */
+  function setViewMode(mode) {
+    state.viewMode = mode;
+    updateViewModeDisplay();
+  }
+
+  function updateViewModeDisplay() {
+    if (!dom.tableResponsiveWrap || !dom.mobileLeadsContainer) return;
+
+    if (state.viewMode === 'cards') {
+      dom.tableResponsiveWrap.style.display = 'none';
+      dom.mobileLeadsContainer.style.display = 'flex';
+      if (dom.btnViewCards) {
+        dom.btnViewCards.classList.add('active');
+        dom.btnViewCards.setAttribute('aria-pressed', 'true');
+      }
+      if (dom.btnViewTable) {
+        dom.btnViewTable.classList.remove('active');
+        dom.btnViewTable.setAttribute('aria-pressed', 'false');
+      }
+    } else {
+      dom.tableResponsiveWrap.style.display = 'block';
+      dom.mobileLeadsContainer.style.display = 'none';
+      if (dom.btnViewTable) {
+        dom.btnViewTable.classList.add('active');
+        dom.btnViewTable.setAttribute('aria-pressed', 'true');
+      }
+      if (dom.btnViewCards) {
+        dom.btnViewCards.classList.remove('active');
+        dom.btnViewCards.setAttribute('aria-pressed', 'false');
+      }
+    }
   }
 
   /**
@@ -303,6 +372,14 @@
             </div>
           </td>
         </tr>
+      `;
+    }
+
+    if (dom.mobileLeadsContainer) {
+      dom.mobileLeadsContainer.innerHTML = `
+        <div style="text-align: center; padding: 36px 16px; color: var(--text-muted); font-size: 0.88rem;">
+          Loading leads...
+        </div>
       `;
     }
 
@@ -351,6 +428,13 @@
           </tr>
         `;
       }
+      if (dom.mobileLeadsContainer) {
+        dom.mobileLeadsContainer.innerHTML = `
+          <div style="text-align: center; padding: 36px 16px; color: #f87171; font-size: 0.88rem;">
+            Failed to load leads: ${escapeHtml(err.message)}
+          </div>
+        `;
+      }
     }
   }
 
@@ -361,24 +445,26 @@
     if (!dom.leadsTableBody) return;
 
     if (!items || items.length === 0) {
-      dom.leadsTableBody.innerHTML = `
-        <tr>
-          <td colspan="11">
-            <div class="empty-state">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <h3>No leads found</h3>
-              <p>Try adjusting your date filter or search criteria.</p>
-            </div>
-          </td>
-        </tr>
+      const emptyHtml = `
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <h3>No leads found</h3>
+          <p>Try adjusting your date filter or search criteria.</p>
+        </div>
       `;
+      dom.leadsTableBody.innerHTML = `<tr><td colspan="11">${emptyHtml}</td></tr>`;
+      if (dom.mobileLeadsContainer) {
+        dom.mobileLeadsContainer.innerHTML = emptyHtml;
+      }
+      updateViewModeDisplay();
       return;
     }
 
     let rowsHtml = '';
+    let cardsHtml = '';
     const startIndex = (state.currentPage - 1) * state.limit;
 
     items.forEach(function (lead, idx) {
@@ -389,6 +475,7 @@
         ? '<span class="badge badge-completed">Completed</span>'
         : '<span class="badge badge-partial">Partial (Step ' + escapeHtml(lead.current_step) + ')</span>';
 
+      // 1. Desktop & Tablet Table Row
       rowsHtml += `
         <tr data-lead-id="${lead.id}">
           <td style="color: var(--text-dim); font-size: 0.78rem;">#${rowNum}</td>
@@ -423,11 +510,82 @@
           </td>
         </tr>
       `;
+
+      // 2. Mobile & Touch Responsive Card
+      cardsHtml += `
+        <div class="mobile-lead-card" data-lead-id="${lead.id}">
+          <div class="mobile-card-header">
+            <div class="mobile-card-ref-wrap">
+              <span class="mobile-card-num">#${rowNum}</span>
+              <span class="lead-ref">${escapeHtml(lead.lead_reference)}</span>
+            </div>
+            ${statusBadge}
+          </div>
+
+          <div class="mobile-card-title-row">
+            <span class="mobile-card-name">${escapeHtml(lead.full_name || '—')}</span>
+            <span class="mobile-card-date">${dateFormatted}</span>
+          </div>
+
+          <div class="mobile-contact-chips">
+            ${lead.mobile_number ? `
+              <a href="tel:${escapeHtml(lead.mobile_number)}" class="mobile-contact-chip tel" title="Call primary mobile">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                <span>+91 ${escapeHtml(lead.mobile_number)}</span>
+              </a>
+            ` : ''}
+            ${lead.whatsapp_number ? `
+              <a href="https://wa.me/91${escapeHtml(lead.whatsapp_number)}" target="_blank" rel="noopener" class="mobile-contact-chip wa" title="Chat on WhatsApp">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span>WhatsApp</span>
+              </a>
+            ` : ''}
+          </div>
+
+          <div class="mobile-card-details-grid">
+            <div class="mobile-detail-item">
+              <span class="mobile-detail-label">Segment</span>
+              <span class="mobile-detail-val">${escapeHtml(lead.trading_segment || '—')}</span>
+            </div>
+            <div class="mobile-detail-item">
+              <span class="mobile-detail-label">Capital</span>
+              <span class="mobile-detail-val">${escapeHtml(lead.trading_capital || '—')}</span>
+            </div>
+            <div class="mobile-detail-item">
+              <span class="mobile-detail-label">State</span>
+              <span class="mobile-detail-val">${escapeHtml(lead.state || '—')}</span>
+            </div>
+          </div>
+
+          <div class="mobile-card-actions">
+            <button type="button" class="mobile-action-btn-view" data-action="view" data-id="${lead.id}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>View Dossier & Timeline</span>
+            </button>
+            <button type="button" class="mobile-action-btn-delete" title="Delete Lead" data-action="delete" data-id="${lead.id}" data-ref="${escapeHtml(lead.lead_reference)}" data-name="${escapeHtml(lead.full_name || 'Unnamed Lead')}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
     });
 
     dom.leadsTableBody.innerHTML = rowsHtml;
+    if (dom.mobileLeadsContainer) {
+      dom.mobileLeadsContainer.innerHTML = cardsHtml;
+    }
 
-    // Attach row action listeners
+    // Attach row action listeners for Table
     const viewButtons = dom.leadsTableBody.querySelectorAll('[data-action="view"]');
     viewButtons.forEach(btn => {
       btn.addEventListener('click', function () {
@@ -445,6 +603,29 @@
         openDeleteModal(leadId, leadRef, leadName);
       });
     });
+
+    // Attach action listeners for Mobile Cards
+    if (dom.mobileLeadsContainer) {
+      const mobileViewButtons = dom.mobileLeadsContainer.querySelectorAll('[data-action="view"]');
+      mobileViewButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const leadId = this.getAttribute('data-id');
+          openDetailModal(leadId);
+        });
+      });
+
+      const mobileDeleteButtons = dom.mobileLeadsContainer.querySelectorAll('[data-action="delete"]');
+      mobileDeleteButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const leadId = this.getAttribute('data-id');
+          const leadRef = this.getAttribute('data-ref');
+          const leadName = this.getAttribute('data-name');
+          openDeleteModal(leadId, leadRef, leadName);
+        });
+      });
+    }
+
+    updateViewModeDisplay();
   }
 
   /**
