@@ -29,8 +29,8 @@ if ($admin) {
 echo "[TEST 2] Verifying Admin Password Hash...\n";
 $stmtPass = $pdo->query("SELECT password_hash FROM admin_users WHERE username = 'admin'");
 $hash = $stmtPass->fetchColumn();
-if (password_verify('Admin@2026#Stock', $hash)) {
-    echo "  -> SUCCESS! Password 'Admin@2026#Stock' verified against bcrypt hash.\n\n";
+if (password_verify('Stock@2026#Trading', $hash)) {
+    echo "  -> SUCCESS! Password 'Stock@2026#Trading' verified against bcrypt hash.\n\n";
 } else {
     echo "  -> FAILED: Password verification mismatch.\n";
     exit(1);

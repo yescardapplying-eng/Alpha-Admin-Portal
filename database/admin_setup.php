@@ -30,7 +30,7 @@ try {
 
     // Check if default admin exists
     $defaultUser = getenv('ADMIN_USERNAME') ?: 'admin';
-    $defaultPass = getenv('ADMIN_PASSWORD') ?: 'Admin@2026#Stock';
+    $defaultPass = getenv('ADMIN_PASSWORD') ?: 'Stock@2026#Trading';
 
     $stmt = $pdo->prepare("SELECT id FROM admin_users WHERE username = ?");
     $stmt->execute([$defaultUser]);
